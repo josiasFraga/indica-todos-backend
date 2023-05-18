@@ -10,6 +10,9 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string $name
+ * @property string $image
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  */
 class ServiceCategory extends Entity
 {
@@ -23,6 +26,9 @@ class ServiceCategory extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
+        'created' => true,
+        'modified' => true,
         'name' => true,
+        'image' => true,
     ];
 }

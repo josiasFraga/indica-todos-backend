@@ -8,6 +8,7 @@ use Cake\Core\Exception\Exception;
 use Cake\Utility\Security;
 use Firebase\JWT\JWT;
 use Cake\ORM\TableRegistry;
+use Cake\Http\Exception\UnauthorizedException;
 
 class AuthController extends AppController
 {
@@ -16,27 +17,37 @@ class AuthController extends AppController
     public function login()
     {
         $usersTable = TableRegistry::getTableLocator()->get('Users');
+        $servicesTable = TableRegistry::getTableLocator()->get('Services');
         $dados = json_decode($this->request->getData('dados'), true);
 
         $user = $usersTable->find()
         ->where([
-            'email' => $dados["email"]
+            'Users.email' => $dados["email"]
         ])
+        ->contain('ServiceProviders')
         ->first();
-            
+
+        $valdiade = time() + 1204800;
         if ($user && $user->password === Security::hash($dados["password"], 'sha256', true)) {
             $payload = [
                 'sub' => $user->id,
-                'exp' => time() + 604800
+                'exp' => time() + 1204800
             ];
 
-        
+            $checkService = false;
+
+            if ( $user->service_provider && $user->service_provider->id ) {
+                $checkService = $servicesTable->exists(['service_provider_id' => $user->service_provider->id]);
+            }
+                    
             $jwt = JWT::encode($payload, Security::getSalt(), 'HS256');
 
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'token' => $jwt,
-                    'type' => !empty($user->provider_id) ? 'servide_provider' : 'user',
+                    'validation' => $valdiade,
+                    'type' => !empty($user->service_provider_id) ? 'servide_provider' : 'user',
+                    'services_exist' => $checkService ? '1' : '0'
                 ]));
         } else {
             throw new Exception('Usuário ou senha inválidos');

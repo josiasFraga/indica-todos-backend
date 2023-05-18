@@ -10,12 +10,14 @@ use Cake\Utility\Security;
  * User Entity
  *
  * @property int $id
- * @property int|null $provider_id
+ * @property int|null $service_provider_id
  * @property string $name
  * @property string $email
  * @property string $password
  * @property string $phone
  * @property string $photo
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
  * @property \App\Model\Entity\ServiceProvider $service_provider
  * @property \App\Model\Entity\Review[] $reviews
@@ -32,7 +34,9 @@ class User extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
-        'provider_id' => true,
+        'created' => true,
+        'modified' => true,
+        'service_provider_id' => true,
         'name' => true,
         'email' => true,
         'password' => true,

@@ -13,7 +13,8 @@ use Cake\ORM\Entity;
  * @property int $service_id
  * @property int $rating
  * @property string $comment
- * @property \Cake\I18n\FrozenTime $created_at
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
  * @property \App\Model\Entity\User $user
  * @property \App\Model\Entity\Service $service
@@ -30,11 +31,12 @@ class Review extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
+        'created' => true,
+        'modified' => true,
         'user_id' => true,
         'service_id' => true,
         'rating' => true,
         'comment' => true,
-        'created_at' => true,
         'user' => true,
         'service' => true,
     ];

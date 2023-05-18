@@ -25,6 +25,9 @@ class ServiceProvidersTableTest extends TestCase
      */
     protected $fixtures = [
         'app.ServiceProviders',
+        'app.Locations',
+        'app.Payments',
+        'app.Services',
     ];
 
     /**

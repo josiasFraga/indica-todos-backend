@@ -19,12 +19,38 @@ class ServiceCategoriesController extends AppController
     public function index()
     {
         //$jwtPayload = $this->request->getAttribute('jwtPayload');
+        $with_business = $this->request->getQuery('with_business');
+        $user_location = $this->request->getQuery('user_location');
 
-        $serviceCatgories = $this->ServiceCategories->find('all')->where();
+
+        $conditions = [];
+
+        if ( $with_business ){ 
+            $serviceCatgories = $this->ServiceCategories
+            ->find('all')
+            ->where()
+            ->innerJoinWith('Services')
+            ->matching('Services.ServiceProviders', function ($q) use ($user_location) {
+                if (!empty($user_location)) {
+                    return $q->where([
+                        'ServiceProviders.city' => $user_location['city'],
+                        'ServiceProviders.state' => $user_location['state']
+                    ]);
+                }
+                return $q;
+            })
+            ->distinct(['ServiceCategories.id'])
+            ->order('ServiceCategories.name');
+        } else {
+            
+            $serviceCatgories = $this->ServiceCategories->find('all')->where()->order('ServiceCategories.name');
+        }
+
 
         $this->set([
             'data' => $serviceCatgories,
-            '_serialize' => ['data']
+            'status' => 'ok',
+            '_serialize' => ['data', 'status']
         ]);
     }
 

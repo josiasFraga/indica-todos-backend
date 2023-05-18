@@ -13,8 +13,11 @@ use Cake\ORM\Entity;
  * @property string $description
  * @property int $category_id
  * @property int $subcategory_id
- * @property int $provider_id
+ * @property int $service_provider_id
  * @property string $price
+ * @property string|null $price_unit
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
  * @property \App\Model\Entity\ServiceCategory $service_category
  * @property \App\Model\Entity\ServiceSubcategory $service_subcategory
@@ -37,8 +40,11 @@ class Service extends Entity
         'description' => true,
         'category_id' => true,
         'subcategory_id' => true,
-        'provider_id' => true,
+        'service_provider_id' => true,
         'price' => true,
+        'price_unit' => true,
+        'created' => true,
+        'modified' => true,
         'service_category' => true,
         'service_subcategory' => true,
         'service_provider' => true,

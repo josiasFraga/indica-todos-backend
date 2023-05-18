@@ -26,6 +26,12 @@ class ServiceProvidersFixture extends TestFixture
                 'address' => 'Lorem ipsum dolor sit amet',
                 'address_number' => 1,
                 'address_complement' => 'Lorem ipsum dolor sit amet',
+                'city' => 'Lorem ipsum dolor sit amet',
+                'state' => '',
+                'postal_code' => 'Lorem i',
+                'neighborhood' => 'Lorem ipsum dolor sit amet',
+                'created' => '2023-04-24 21:19:43',
+                'modified' => '2023-04-24 21:19:43',
             ],
         ];
         parent::init();

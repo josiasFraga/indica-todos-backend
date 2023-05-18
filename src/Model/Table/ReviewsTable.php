@@ -80,11 +80,6 @@ class ReviewsTable extends Table
             ->requirePresence('comment', 'create')
             ->notEmptyString('comment');
 
-        $validator
-            ->dateTime('created_at')
-            ->requirePresence('created_at', 'create')
-            ->notEmptyDateTime('created_at');
-
         return $validator;
     }
 

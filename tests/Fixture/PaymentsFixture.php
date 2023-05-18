@@ -20,11 +20,11 @@ class PaymentsFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
-                'provider_id' => 1,
+                'service_provider_id' => 1,
                 'amount' => 1.5,
                 'status' => 'Lorem ipsum dolor sit amet',
                 'payment_type' => 'Lorem ipsum dolor sit amet',
-                'created_at' => '2023-04-18 12:59:36',
+                'created_at' => '2023-04-18 17:29:12',
             ],
         ];
         parent::init();

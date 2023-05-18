@@ -6,18 +6,19 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Location Entity
+ * UserLocation Entity
  *
  * @property int $id
- * @property int $service_provider_id
- * @property string $city
- * @property string $state
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
+ * @property int|null $user_id
+ * @property string|null $device_id
+ * @property string $city
+ * @property string $state
  *
- * @property \App\Model\Entity\ServiceProvider $service_provider
+ * @property \App\Model\Entity\User $user
  */
-class Location extends Entity
+class UserLocation extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -31,9 +32,10 @@ class Location extends Entity
     protected $_accessible = [
         'created' => true,
         'modified' => true,
-        'service_provider_id' => true,
+        'user_id' => true,
+        'device_id' => true,
         'city' => true,
         'state' => true,
-        'service_provider' => true,
+        'user' => true,
     ];
 }

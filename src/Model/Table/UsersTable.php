@@ -48,9 +48,12 @@ class UsersTable extends Table
         $this->setPrimaryKey('id');
 
         $this->belongsTo('ServiceProviders', [
-            'foreignKey' => 'provider_id',
+            'foreignKey' => 'service_provider_id',
         ]);
         $this->hasMany('Reviews', [
+            'foreignKey' => 'user_id',
+        ]);
+        $this->hasMany('ServiceProviderVisits', [
             'foreignKey' => 'user_id',
         ]);
         $this->addBehavior('Josegonzalez/Upload.Upload', [
@@ -77,8 +80,8 @@ class UsersTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->integer('provider_id')
-            ->allowEmptyString('provider_id');
+            ->integer('service_provider_id')
+            ->allowEmptyString('service_provider_id');
 
         $validator
             ->scalar('name')
@@ -89,7 +92,8 @@ class UsersTable extends Table
         $validator
             ->email('email')
             ->requirePresence('email', 'create')
-            ->notEmptyString('email');
+            ->notEmptyString('email')
+            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table', 'message' => 'O email informado, já está sendo suado por outro usuário.']);
 
         $validator
             ->scalar('password')
@@ -102,6 +106,9 @@ class UsersTable extends Table
             ->maxLength('phone', 255)
             ->requirePresence('phone', 'create')
             ->notEmptyString('phone');
+
+        $validator
+            ->notEmptyString('photo');
 
         return $validator;
     }
@@ -116,7 +123,7 @@ class UsersTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
-        $rules->add($rules->existsIn('provider_id', 'ServiceProviders'), ['errorField' => 'provider_id']);
+        $rules->add($rules->existsIn('service_provider_id', 'ServiceProviders'), ['errorField' => 'service_provider_id']);
 
         return $rules;
     }

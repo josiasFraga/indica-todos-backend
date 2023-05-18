@@ -40,6 +40,11 @@ class ServiceCategoriesTable extends Table
         $this->setTable('service_categories');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
+
+        $this->hasMany('Services', [
+            'foreignKey' => 'category_id',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**

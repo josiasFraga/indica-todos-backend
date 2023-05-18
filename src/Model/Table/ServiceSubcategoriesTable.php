@@ -11,6 +11,8 @@ use Cake\Validation\Validator;
 /**
  * ServiceSubcategories Model
  *
+ * @property \App\Model\Table\ServiceCategoriesTable&\Cake\ORM\Association\BelongsTo $ServiceCategories
+ *
  * @method \App\Model\Entity\ServiceSubcategory newEmptyEntity()
  * @method \App\Model\Entity\ServiceSubcategory newEntity(array $data, array $options = [])
  * @method \App\Model\Entity\ServiceSubcategory[] newEntities(array $data, array $options = [])

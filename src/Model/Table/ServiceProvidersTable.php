@@ -11,6 +11,10 @@ use Cake\Validation\Validator;
 /**
  * ServiceProviders Model
  *
+ * @property \App\Model\Table\LocationsTable&\Cake\ORM\Association\HasMany $Locations
+ * @property \App\Model\Table\PaymentsTable&\Cake\ORM\Association\HasMany $Payments
+ * @property \App\Model\Table\ServicesTable&\Cake\ORM\Association\HasMany $Services
+ *
  * @method \App\Model\Entity\ServiceProvider newEmptyEntity()
  * @method \App\Model\Entity\ServiceProvider newEntity(array $data, array $options = [])
  * @method \App\Model\Entity\ServiceProvider[] newEntities(array $data, array $options = [])
@@ -24,6 +28,8 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\ServiceProvider[]|\Cake\Datasource\ResultSetInterface saveManyOrFail(iterable $entities, $options = [])
  * @method \App\Model\Entity\ServiceProvider[]|\Cake\Datasource\ResultSetInterface|false deleteMany(iterable $entities, $options = [])
  * @method \App\Model\Entity\ServiceProvider[]|\Cake\Datasource\ResultSetInterface deleteManyOrFail(iterable $entities, $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class ServiceProvidersTable extends Table
 {
@@ -40,6 +46,24 @@ class ServiceProvidersTable extends Table
         $this->setTable('service_providers');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Timestamp');
+
+        $this->hasMany('Locations', [
+            'foreignKey' => 'service_provider_id',
+        ]);
+        $this->hasMany('Payments', [
+            'foreignKey' => 'service_provider_id',
+        ]);
+        $this->hasMany('Services', [
+            'foreignKey' => 'service_provider_id',
+        ]);
+        $this->hasMany('Users', [
+            'foreignKey' => 'service_provider_id',
+        ]);
+        $this->hasMany('ServiceProviders', [
+            'foreignKey' => 'service_provider_id',
+        ]);
     }
 
     /**
@@ -81,7 +105,32 @@ class ServiceProvidersTable extends Table
         $validator
             ->scalar('address_complement')
             ->maxLength('address_complement', 50)
+            ->requirePresence('address_complement', 'create')
             ->notEmptyString('address_complement');
+
+        $validator
+            ->scalar('city')
+            ->maxLength('city', 50)
+            ->requirePresence('city', 'create')
+            ->notEmptyString('city');
+
+        $validator
+            ->scalar('state')
+            ->maxLength('state', 2)
+            ->requirePresence('state', 'create')
+            ->notEmptyString('state');
+
+        $validator
+            ->scalar('postal_code')
+            ->maxLength('postal_code', 9)
+            ->requirePresence('postal_code', 'create')
+            ->notEmptyString('postal_code');
+
+        $validator
+            ->scalar('neighborhood')
+            ->maxLength('neighborhood', 255)
+            ->requirePresence('neighborhood', 'create')
+            ->notEmptyString('neighborhood');
 
         return $validator;
     }

@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\ServiceSubcategoriesTable;
+use App\Model\Table\UserLocationsTable;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\ServiceSubcategoriesTable Test Case
+ * App\Model\Table\UserLocationsTable Test Case
  */
-class ServiceSubcategoriesTableTest extends TestCase
+class UserLocationsTableTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \App\Model\Table\ServiceSubcategoriesTable
+     * @var \App\Model\Table\UserLocationsTable
      */
-    protected $ServiceSubcategories;
+    protected $UserLocations;
 
     /**
      * Fixtures
@@ -24,8 +24,8 @@ class ServiceSubcategoriesTableTest extends TestCase
      * @var array<string>
      */
     protected $fixtures = [
-        'app.ServiceSubcategories',
-        'app.ServiceCategories',
+        'app.UserLocations',
+        'app.Users',
     ];
 
     /**
@@ -36,8 +36,8 @@ class ServiceSubcategoriesTableTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $config = $this->getTableLocator()->exists('ServiceSubcategories') ? [] : ['className' => ServiceSubcategoriesTable::class];
-        $this->ServiceSubcategories = $this->getTableLocator()->get('ServiceSubcategories', $config);
+        $config = $this->getTableLocator()->exists('UserLocations') ? [] : ['className' => UserLocationsTable::class];
+        $this->UserLocations = $this->getTableLocator()->get('UserLocations', $config);
     }
 
     /**
@@ -47,7 +47,7 @@ class ServiceSubcategoriesTableTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->ServiceSubcategories);
+        unset($this->UserLocations);
 
         parent::tearDown();
     }
@@ -56,7 +56,7 @@ class ServiceSubcategoriesTableTest extends TestCase
      * Test validationDefault method
      *
      * @return void
-     * @uses \App\Model\Table\ServiceSubcategoriesTable::validationDefault()
+     * @uses \App\Model\Table\UserLocationsTable::validationDefault()
      */
     public function testValidationDefault(): void
     {
@@ -67,7 +67,7 @@ class ServiceSubcategoriesTableTest extends TestCase
      * Test buildRules method
      *
      * @return void
-     * @uses \App\Model\Table\ServiceSubcategoriesTable::buildRules()
+     * @uses \App\Model\Table\UserLocationsTable::buildRules()
      */
     public function testBuildRules(): void
     {

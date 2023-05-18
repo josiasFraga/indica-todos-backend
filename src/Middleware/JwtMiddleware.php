@@ -14,7 +14,11 @@ class JwtMiddleware
         '/auth/login',
         '/users/add',
         '/service-categories/index',
-        '/service-subcategories/index'
+        '/service-subcategories/index',
+        '/service-providers/index',
+        '/user-locations/add',
+        '/user-locations/last',
+        '/service-provider-visits/add'
     ];
 
     public function __invoke(ServerRequest $request, Response $response, $next)

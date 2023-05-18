@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use Cake\Http\Exception\UnauthorizedException;
 
 /**
  * Users Controller
@@ -33,13 +34,20 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    public function me($id = null)
     {
-        $user = $this->Users->get($id, [
-            'contain' => ['ServiceProviders', 'Reviews'],
-        ]);
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $user = $this->Users->find()
+        ->select(['id', 'name', 'email', 'phone', 'photo', 'created'])
+        ->where([
+            'Users.id' => $jwtPayload->sub
+        ])->first();
 
-        $this->set(compact('user'));
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'data' => $user
+        ]));
     }
 
     /**
@@ -50,18 +58,24 @@ class UsersController extends AppController
     public function add()
     {
         $this->request->allowMethod(['post', 'put']);
-        $user = $this->Users->newEmptyEntity();
         $dados = json_decode($this->request->getData('dados'), true);
-        $user = $this->Users->patchEntity($user, $dados);
+
+        $user = $this->Users->newEntity($dados, [
+            'associated' => ['ServiceProviders.Services']
+        ]);
+
+        //$user = $this->Users->patchEntity($user, $dados);
 
         if ( !$this->Users->save($user) ) {
+            $errors = $user->getErrors();
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Occoreu um erro ao salvar seus dados. Por favor, tent mais tarde!'
+                'msg' => 'Occoreu um erro ao salvar seus dados. Por favor, tent mais tarde!',
+                'error' => $errors
             ]));
         }
-    
+
         return $this->response->withType('application/json')
         ->withStringBody(json_encode([
             'status' => 'ok',

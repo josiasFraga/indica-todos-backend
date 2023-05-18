@@ -29,6 +29,8 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\Service[]|\Cake\Datasource\ResultSetInterface saveManyOrFail(iterable $entities, $options = [])
  * @method \App\Model\Entity\Service[]|\Cake\Datasource\ResultSetInterface|false deleteMany(iterable $entities, $options = [])
  * @method \App\Model\Entity\Service[]|\Cake\Datasource\ResultSetInterface deleteManyOrFail(iterable $entities, $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class ServicesTable extends Table
 {
@@ -46,6 +48,8 @@ class ServicesTable extends Table
         $this->setDisplayField('title');
         $this->setPrimaryKey('id');
 
+        $this->addBehavior('Timestamp');
+
         $this->belongsTo('ServiceCategories', [
             'foreignKey' => 'category_id',
             'joinType' => 'INNER',
@@ -55,7 +59,7 @@ class ServicesTable extends Table
             'joinType' => 'INNER',
         ]);
         $this->belongsTo('ServiceProviders', [
-            'foreignKey' => 'provider_id',
+            'foreignKey' => 'service_provider_id',
             'joinType' => 'INNER',
         ]);
         $this->hasMany('Reviews', [
@@ -91,13 +95,18 @@ class ServicesTable extends Table
             ->notEmptyString('subcategory_id');
 
         $validator
-            ->integer('provider_id')
-            ->notEmptyString('provider_id');
+            ->integer('service_provider_id')
+            ->notEmptyString('service_provider_id');
 
         $validator
             ->decimal('price')
             ->requirePresence('price', 'create')
             ->notEmptyString('price');
+
+        $validator
+            ->scalar('price_unit')
+            ->maxLength('price_unit', 10)
+            ->allowEmptyString('price_unit');
 
         return $validator;
     }
@@ -113,7 +122,7 @@ class ServicesTable extends Table
     {
         $rules->add($rules->existsIn('category_id', 'ServiceCategories'), ['errorField' => 'category_id']);
         $rules->add($rules->existsIn('subcategory_id', 'ServiceSubcategories'), ['errorField' => 'subcategory_id']);
-        $rules->add($rules->existsIn('provider_id', 'ServiceProviders'), ['errorField' => 'provider_id']);
+        $rules->add($rules->existsIn('service_provider_id', 'ServiceProviders'), ['errorField' => 'service_provider_id']);
 
         return $rules;
     }

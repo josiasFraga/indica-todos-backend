@@ -15,6 +15,16 @@ use Cake\ORM\Entity;
  * @property string $address
  * @property int $address_number
  * @property string $address_complement
+ * @property string $city
+ * @property string $state
+ * @property string $postal_code
+ * @property string $neighborhood
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
+ *
+ * @property \App\Model\Entity\Location[] $locations
+ * @property \App\Model\Entity\Payment[] $payments
+ * @property \App\Model\Entity\Service[] $services
  */
 class ServiceProvider extends Entity
 {
@@ -34,5 +44,14 @@ class ServiceProvider extends Entity
         'address' => true,
         'address_number' => true,
         'address_complement' => true,
+        'city' => true,
+        'state' => true,
+        'postal_code' => true,
+        'neighborhood' => true,
+        'created' => true,
+        'modified' => true,
+        'locations' => true,
+        'payments' => true,
+        'services' => true,
     ];
 }

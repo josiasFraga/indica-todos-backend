@@ -9,11 +9,12 @@ use Cake\ORM\Entity;
  * Payment Entity
  *
  * @property int $id
- * @property int $provider_id
+ * @property int $service_provider_id
  * @property string $amount
  * @property string $status
  * @property string $payment_type
- * @property \Cake\I18n\FrozenTime $created_at
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
  * @property \App\Model\Entity\ServiceProvider $service_provider
  */
@@ -29,7 +30,9 @@ class Payment extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
-        'provider_id' => true,
+        'created' => true,
+        'modified' => true,
+        'service_provider_id' => true,
         'amount' => true,
         'status' => true,
         'payment_type' => true,

@@ -44,7 +44,7 @@ class LocationsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->belongsTo('ServiceProviders', [
-            'foreignKey' => 'provider_id',
+            'foreignKey' => 'service_provider_id',
             'joinType' => 'INNER',
         ]);
     }
@@ -58,14 +58,8 @@ class LocationsTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->integer('provider_id')
-            ->notEmptyString('provider_id');
-
-        $validator
-            ->scalar('address')
-            ->maxLength('address', 255)
-            ->requirePresence('address', 'create')
-            ->notEmptyString('address');
+            ->integer('service_provider_id')
+            ->notEmptyString('service_provider_id');
 
         $validator
             ->scalar('city')
@@ -75,8 +69,7 @@ class LocationsTable extends Table
 
         $validator
             ->scalar('state')
-            ->maxLength('state', 255)
-            ->requirePresence('state', 'create')
+            ->maxLength('state', 2)
             ->notEmptyString('state');
 
         return $validator;
@@ -91,7 +84,7 @@ class LocationsTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->existsIn('provider_id', 'ServiceProviders'), ['errorField' => 'provider_id']);
+        $rules->add($rules->existsIn('service_provider_id', 'ServiceProviders'), ['errorField' => 'service_provider_id']);
 
         return $rules;
     }

@@ -18,9 +18,24 @@ class ServiceProvidersController extends AppController
      */
     public function index()
     {
-        $serviceProviders = $this->paginate($this->ServiceProviders);
 
-        $this->set(compact('serviceProviders'));
+        $conditions = [];
+        $categoriaId = $this->request->getQuery('categoria_id');
+
+        $serviceProviders = $this->ServiceProviders
+        ->find()
+        ->matching('Services', function ($q) use ($categoriaId) {
+            if (!empty($categoriaId)) {
+                return $q->where(['Services.category_id' => $categoriaId]);
+            }
+            return $q;
+        })
+        ->contain(['Services'])->group(['ServiceProviders.id']);
+        $this->set([
+            'data' => $serviceProviders,
+            'status' => 'ok',
+            '_serialize' => ['data', 'status']
+        ]);
     }
 
     /**

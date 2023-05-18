@@ -49,20 +49,46 @@ class ServicesController extends AppController
      */
     public function add()
     {
-        $service = $this->Services->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $service = $this->Services->patchEntity($service, $this->request->getData());
-            if ($this->Services->save($service)) {
-                $this->Flash->success(__('The service has been saved.'));
+        $this->request->allowMethod(['post', 'put']);
+        
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The service could not be saved. Please, try again.'));
+        $this->loadModel('Users');
+
+        $user = $this->Users->find('all')->where(['id' =>  $jwtPayload->sub])->first();
+
+        if ( !$user || empty($user['service_provider_id']) ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'msg' => 'Sem permissão de acesso'
+            ]));
+
         }
-        $serviceCategories = $this->Services->ServiceCategories->find('list', ['limit' => 200])->all();
-        $serviceSubcategories = $this->Services->ServiceSubcategories->find('list', ['limit' => 200])->all();
-        $serviceProviders = $this->Services->ServiceProviders->find('list', ['limit' => 200])->all();
-        $this->set(compact('service', 'serviceCategories', 'serviceSubcategories', 'serviceProviders'));
+
+        $service = $this->Services->newEmptyEntity();
+        $dados = json_decode($this->request->getData('dados'), true);
+        $dados['service_provider_id'] = $user->service_provider_id;
+
+        $service = $this->Services->patchEntity($service, $dados);
+        
+        if ( !$this->Services->save($service)) {
+            $errors = $service->getErrors();
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'msg' => 'Erro ao salvar os dados do serviço',
+                'error' => $errors
+            ]));
+        }
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'msg' => 'Seriviço cadastrado com sucesso!'
+        ]));
     }
 
     /**
@@ -74,22 +100,59 @@ class ServicesController extends AppController
      */
     public function edit($id = null)
     {
-        $service = $this->Services->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $service = $this->Services->patchEntity($service, $this->request->getData());
-            if ($this->Services->save($service)) {
-                $this->Flash->success(__('The service has been saved.'));
+        
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The service could not be saved. Please, try again.'));
+        $this->loadModel('Users');
+
+        $user = $this->Users->find('all')->where(['id' =>  $jwtPayload->sub])->first();
+
+        if ( !$user || empty($user['service_provider_id']) ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'msg' => 'Sem permissão de acesso'
+            ]));
+
         }
-        $serviceCategories = $this->Services->ServiceCategories->find('list', ['limit' => 200])->all();
-        $serviceSubcategories = $this->Services->ServiceSubcategories->find('list', ['limit' => 200])->all();
-        $serviceProviders = $this->Services->ServiceProviders->find('list', ['limit' => 200])->all();
-        $this->set(compact('service', 'serviceCategories', 'serviceSubcategories', 'serviceProviders'));
+        
+        $service = $this->Services->get($id, [
+            'conditions' => [
+                'service_provider_id' => $user['service_provider_id']
+            ],
+        ]);
+
+        if ( !$service ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'msg' => 'Dados do serviço não encontrados.'
+            ]));
+
+        }
+        
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $service = $this->Services->patchEntity($service, json_decode($this->request->getData('dados'), true));
+        }
+        
+        if ( !$this->Services->save($service) ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'msg' => 'Ocorreu um erro ao atualizar o serviço, por favor, tente mais tarde'
+            ]));
+
+        }
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'msg' => 'Serviço alterado com sucesso!'
+        ]));
+    
     }
 
     /**
