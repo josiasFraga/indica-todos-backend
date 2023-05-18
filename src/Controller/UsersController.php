@@ -128,4 +128,30 @@ class UsersController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
+    public function changePassword (){
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $user = $this->Users->get($jwtPayload->sub, [
+            'contain' => [],
+        ]);
+        $dados = json_decode($this->request->getData('dados'), true);
+
+        $user = $this->Users->patchEntity($user, ['password' => $dados['password']]);
+
+        if ( !$this->Users->save($user) ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Ocorreu um erro ao tentar alterar a senha do usuário'
+            ]));
+        }
+
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok'
+        ]));
+
+    }
 }
