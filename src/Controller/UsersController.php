@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 use Cake\Http\Exception\UnauthorizedException;
+use Cake\Log\Log;
 
 /**
  * Users Controller
@@ -42,6 +43,12 @@ class UsersController extends AppController
         ->where([
             'Users.id' => $jwtPayload->sub
         ])->first();
+
+        // Verifica se o usuário foi encontrado
+        if ($user) {
+            // Adiciona o caminho ao campo 'photo'
+            $user->photo = 'img/users/' . $user->photo;
+        }
 
         return $this->response->withType('application/json')
         ->withStringBody(json_encode([
@@ -84,51 +91,6 @@ class UsersController extends AppController
 
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $user = $this->Users->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
-        }
-        $serviceProviders = $this->Users->ServiceProviders->find('list', ['limit' => 200])->all();
-        $this->set(compact('user', 'serviceProviders'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null|void Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $user = $this->Users->get($id);
-        if ($this->Users->delete($user)) {
-            $this->Flash->success(__('The user has been deleted.'));
-        } else {
-            $this->Flash->error(__('The user could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
-    }
-
     public function changePassword (){
         $jwtPayload = $this->request->getAttribute('jwtPayload');
         $user = $this->Users->get($jwtPayload->sub, [
@@ -152,6 +114,46 @@ class UsersController extends AppController
         ->withStringBody(json_encode([
             'status' => 'ok'
         ]));
+
+    }
+
+    public function changePhoto (){
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+
+        $foto = $this->getRequest()->getData('photo');
+
+   
+        try {
+            $user = $this->Users->get($userId);
+            unset($user->password);
+            $user = $this->Users->patchEntity($user, $this->request->getData(), $this->request->getData(), [
+                'associated' => [], // Certifique-se de desabilitar associações
+            ]);
+            
+            if ($this->Users->save($user)) {
+                return $this->getResponse()->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'status' => 'ok'
+                    ]));
+            } else {
+                throw new Exception('Ocorreu um erro ao tentar alterar a foto do usuário');
+            }
+        } catch (RecordNotFoundException $exception) {
+            return $this->getResponse()->withType('application/json')
+                ->withStatus(404)
+                ->withStringBody(json_encode([
+                    'status' => 'erro',
+                    'message' => 'Usuário não encontrado'
+                ]));
+        } catch (Exception $exception) {
+            return $this->getResponse()->withType('application/json')
+                ->withStatus(500)
+                ->withStringBody(json_encode([
+                    'status' => 'erro',
+                    'message' => $exception->getMessage()
+                ]));
+        }
 
     }
 }

@@ -7,9 +7,13 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-use Josegonzalez\Upload\Validation\DefaultValidation;
-use Josegonzalez\Upload\Validation\ImageValidation;
-use Josegonzalez\Upload\Storage\FileSystem;
+use Josegonzalez\Upload\File\Path\Processor\DefaultProcessor;
+use Josegonzalez\Upload\File\Path\Sanitizer\DefaultSanitizer;
+use Josegonzalez\Upload\File\Path\ProcessorInterface;
+use Josegonzalez\Upload\File\Path\SanitizerInterface;
+use Josegonzalez\Upload\File\Path\SimpleSlugSanitizer;
+use Josegonzalez\Upload\File\Path\DefaultProcessor as BaseDefaultProcessor;
+use Cake\Utility\Text;
 
 /**
  * Users Model
@@ -59,8 +63,9 @@ class UsersTable extends Table
         $this->addBehavior('Josegonzalez/Upload.Upload', [
             'photo' => [
                 'path' => 'webroot{DS}img{DS}users{DS}',
-                'nameCallback' => function ($data, $settings) {
-                    $extension = pathinfo($data['name'], PATHINFO_EXTENSION);
+                'nameCallback' => function ($table, $entity, $data, $field, $settings) {
+     
+                    $extension = pathinfo($data->getClientFilename(), PATHINFO_EXTENSION);
                     return 'photo-' . uniqid() . '.' . $extension;
                 },
                 'validate' => [
@@ -107,9 +112,6 @@ class UsersTable extends Table
             ->requirePresence('phone', 'create')
             ->notEmptyString('phone');
 
-        $validator
-            ->notEmptyString('photo');
-
         return $validator;
     }
 
@@ -127,4 +129,18 @@ class UsersTable extends Table
 
         return $rules;
     }
+    
+    /*public function beforeSave(EventInterface $event, EntityInterface $entity, ArrayObject $options)
+    {
+        debug("teste"); die();
+        // Verifica se o campo 'photo' foi alterado
+        if ($entity->isDirty('photo')) {
+            $file = $entity->get('photo');
+            $filename = time() . '_' . $file->getClientFilename();
+            $path = WWW_ROOT . 'img' . DS . 'users' . DS . $filename;
+            $image = Image::make($file->getStream())->save($path);
+            $entity->set('photo', $filename); // ou $entity->set('photo', $path) se quiser salvar o caminho completo
+        }
+
+    }*/
 }
