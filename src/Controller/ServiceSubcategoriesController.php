@@ -24,8 +24,9 @@ class ServiceSubcategoriesController extends AppController
         $serviceSubcatgories = $this->ServiceSubcategories->find('all')->where(['category_id' => $category_id]);
 
         $this->set([
+            'status' => 'ok',
             'data' => $serviceSubcatgories,
-            '_serialize' => ['data']
+            '_serialize' => ['data', 'status']
         ]);
     }
 

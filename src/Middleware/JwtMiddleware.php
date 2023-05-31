@@ -18,7 +18,8 @@ class JwtMiddleware
         '/service-providers/index',
         '/user-locations/add',
         '/user-locations/last',
-        '/service-provider-visits/add'
+        '/service-provider-visits/add',
+        '/measurement-units/index',
     ];
 
     public function __invoke(ServerRequest $request, Response $response, $next)
