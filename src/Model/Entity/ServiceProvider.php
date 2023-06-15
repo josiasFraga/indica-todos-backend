@@ -50,6 +50,7 @@ class ServiceProvider extends Entity
         'neighborhood' => true,
         'created' => true,
         'modified' => true,
+        'active_signature' => true,
         'locations' => true,
         'payments' => true,
         'services' => true,

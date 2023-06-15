@@ -38,83 +38,64 @@ class ServiceProvidersController extends AppController
         ]);
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id Service Provider id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $serviceProvider = $this->ServiceProviders->get($id, [
-            'contain' => [],
-        ]);
 
-        $this->set(compact('serviceProvider'));
+    public function dashboard()
+    {
+        $this->request->allowMethod(['get']);
+
+        $this->loadModel('ServiceProviderVisits');
+        $this->loadModel('Users');
+
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+        
+        //busca os dados do usuário
+        $query = $this->Users->find()->contain('ServiceProviders')->where(['Users.id' => $userId]);
+        $user = $query->first();
+
+        //conta as visitas na página do prestador
+        $query = $this->ServiceProviderVisits->find()
+        ->where(['service_provider_id' => $user->service_provider_id]);
+
+        $serviceProviderVisits = $query->count();
+
+        //conta as visitas únicas no perfil do prestador
+        $query = $this->ServiceProviderVisits->find()
+        ->where(['service_provider_id' => $user->service_provider_id])
+        ->group(['user_id', 'ip_address']);
+
+        $visitasUnicas = $query->count();
+
+        // Conta os cliques no telefone do prestador
+        $query = $this->ServiceProviderVisits->find()
+            ->where(['service_provider_id' => $user->service_provider_id, 'phone_clicked' => 'Y']);
+    
+        $phoneClicks = $query->count();
+
+        
+        // Calcula a média de visitas por semana no perfil do prestador
+        $query = $this->ServiceProviderVisits->find();
+        $query->select(['week_avg' => $query->newExpr('AVG(created)')])
+            ->where(['service_provider_id' => $user->service_provider_id])
+            ->group([$query->newExpr('WEEK(created)')]);
+
+        $weekAvg = $query->count();
+
+        $data = [
+            'visits' => $serviceProviderVisits,
+            'visits_uniqes' => $visitasUnicas,
+            'phone_clicks' => $phoneClicks,
+            'week_avg' => $weekAvg
+        ];
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'data' => $data,
+        ]));
+
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $serviceProvider = $this->ServiceProviders->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $serviceProvider = $this->ServiceProviders->patchEntity($serviceProvider, $this->request->getData());
-            if ($this->ServiceProviders->save($serviceProvider)) {
-                $this->Flash->success(__('The service provider has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The service provider could not be saved. Please, try again.'));
-        }
-        $this->set(compact('serviceProvider'));
-    }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Service Provider id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $serviceProvider = $this->ServiceProviders->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $serviceProvider = $this->ServiceProviders->patchEntity($serviceProvider, $this->request->getData());
-            if ($this->ServiceProviders->save($serviceProvider)) {
-                $this->Flash->success(__('The service provider has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The service provider could not be saved. Please, try again.'));
-        }
-        $this->set(compact('serviceProvider'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Service Provider id.
-     * @return \Cake\Http\Response|null|void Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $serviceProvider = $this->ServiceProviders->get($id);
-        if ($this->ServiceProviders->delete($serviceProvider)) {
-            $this->Flash->success(__('The service provider has been deleted.'));
-        } else {
-            $this->Flash->error(__('The service provider could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
-    }
 }

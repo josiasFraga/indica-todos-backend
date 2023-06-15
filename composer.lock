@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cf5e9910a267f6a77ba2ab67a7586f1d",
+    "content-hash": "d81309d6d1ddb2d15b9b1fb08c2cdb50",
     "packages": [
         {
             "name": "cakephp/cakephp",
@@ -924,6 +924,51 @@
                 "source": "https://github.com/serbanghita/Mobile-Detect/tree/2.8.41"
             },
             "time": "2022-11-08T18:31:26+00:00"
+        },
+        {
+            "name": "pagseguro/pagseguro-php-sdk",
+            "version": "6.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pagseguro/pagseguro-php-sdk.git",
+                "reference": "de63ce3d582ba5727c42d8d4e67030da9439bff6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pagseguro/pagseguro-php-sdk/zipball/de63ce3d582ba5727c42d8d4e67030da9439bff6",
+                "reference": "de63ce3d582ba5727c42d8d4e67030da9439bff6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "lib-curl": "*",
+                "lib-openssl": "*",
+                "php": "^7.1.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PagSeguro\\": "source/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "PagSeguro"
+                }
+            ],
+            "description": "Biblioteca de integração com o PagSeguro",
+            "support": {
+                "issues": "https://github.com/pagseguro/pagseguro-php-sdk/issues",
+                "source": "https://github.com/pagseguro/pagseguro-php-sdk/tree/6.0.0"
+            },
+            "time": "2018-12-11T11:37:37+00:00"
         },
         {
             "name": "psr/container",

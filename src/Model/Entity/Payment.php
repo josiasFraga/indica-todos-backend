@@ -38,5 +38,6 @@ class Payment extends Entity
         'payment_type' => true,
         'created_at' => true,
         'service_provider' => true,
+        'signature_id' => true,
     ];
 }

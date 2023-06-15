@@ -42,6 +42,7 @@ class User extends Entity
         'password' => true,
         'phone' => true,
         'photo' => true,
+        'cpf' => true,
         'service_provider' => true,
         'reviews' => true,
     ];
