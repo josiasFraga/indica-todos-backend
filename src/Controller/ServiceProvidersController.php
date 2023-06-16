@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use Cake\Log\Log;
 
 /**
  * ServiceProviders Controller
@@ -37,7 +38,6 @@ class ServiceProvidersController extends AppController
             '_serialize' => ['data', 'status']
         ]);
     }
-
 
     public function dashboard()
     {
@@ -96,6 +96,93 @@ class ServiceProvidersController extends AppController
 
     }
 
+    public function loadData()
+    {
+        $this->request->allowMethod(['get']);
+
+        $this->loadModel('ServiceProviderVisits');
+        $this->loadModel('Users');
+
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+
+        //busca os dados do usuário
+        $query = $this->Users->find()->contain('ServiceProviders')->where(['Users.id' => $userId]);
+        $user = $query->first();
+
+        if ( !$user || !$user->service_provider ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Dados não encontrados',
+            ]));
+        }
+
+        $data = $user->service_provider;
+
+        unset($data->id);
+        unset($data->created);
+        unset($data->modified);
+        unset($data->active_signature);
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'data' => $data,
+        ]));
+
+    }
+
+    public function saveData()
+    {
+        $this->request->allowMethod(['post', 'put']);
+
+        $this->loadModel('ServiceProviders');
+        $this->loadModel('Users');
+    
+        $dados = json_decode($this->request->getData('dados'), true);
+    
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+        //Log::debug($this->request->getData('dados'));
+
+        //busca os dados do usuário
+        $query = $this->Users->find()->contain('ServiceProviders')->where(['Users.id' => $userId]);
+        $user = $query->first();
+
+        if ( !$user || !$user->service_provider ) {
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Dados não encontrados',
+            ]));
+        }
+
+        // Obtendo o registro a ser atualizado
+        $serviceProvider = $this->ServiceProviders->get($user->service_provider->id);
+        
+        // Atribuindo os novos valores ao objeto $serviceProvider
+        $serviceProvider = $this->ServiceProviders->patchEntity($serviceProvider, $dados['service_provider']);
+
+        // Salvando as alterações
+        if (!$this->ServiceProviders->save($serviceProvider)) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Erro ao atualizar seus dados. Por favor, tente novamente mais tarde!',
+            ]));
+        }
+        
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'message' => 'Dados atualizados com sucesso!',
+        ]));
+
+    }
 
 
 }
