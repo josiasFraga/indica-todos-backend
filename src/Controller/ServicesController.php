@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use Cake\Log\Log;
 
 /**
  * Services Controller
@@ -11,19 +12,54 @@ namespace App\Controller;
  */
 class ServicesController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
+
     public function index()
     {
-        $this->paginate = [
-            'contain' => ['ServiceCategories', 'ServiceSubcategories', 'ServiceProviders'],
-        ];
-        $services = $this->paginate($this->Services);
+        
+        $this->request->allowMethod(['get']);
 
-        $this->set(compact('services'));
+        $this->loadModel('Services');
+        $this->loadModel('Users');
+
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+
+        //busca os dados do usuário
+        $query = $this->Users->find()->contain('ServiceProviders')->where(['Users.id' => $userId]);
+        $user = $query->first();
+
+        if ( !$user || !$user->service_provider ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Dados não encontrados',
+            ]));
+        }
+
+        $data = $this->Services->find()
+        ->select([
+            'id', 
+            'title', 
+            'description', 
+            'category_id',
+            'subcategory_id',
+            'price',
+            'price_unit',
+        ])
+        ->where([
+            'Services.service_provider_id' => $user->service_provider->id
+        ])->toArray();
+
+        foreach( $data as $key => $d ) {
+            $data[$key]['price'] = "R$ " . number_format(floatval($d['price']), 2, ',', '.');            
+        }
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'data' => $data,
+        ]));
     }
 
     /**
@@ -155,23 +191,60 @@ class ServicesController extends AppController
     
     }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id Service id.
-     * @return \Cake\Http\Response|null|void Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
+    public function saveData()
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $service = $this->Services->get($id);
-        if ($this->Services->delete($service)) {
-            $this->Flash->success(__('The service has been deleted.'));
-        } else {
-            $this->Flash->error(__('The service could not be deleted. Please, try again.'));
+        $this->request->allowMethod(['post', 'put']);
+
+        $this->loadModel('ServiceProviders');
+        $this->loadModel('Users');
+        $this->loadModel('Services');
+    
+        $dados = json_decode($this->request->getData('dados'), true);
+    
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+        //Log::debug($this->request->getData('dados'));
+
+        //busca os dados do usuário
+        $query = $this->Users->find()->contain('ServiceProviders')->where(['Users.id' => $userId]);
+        $user = $query->first();
+
+        if ( !$user || !$user->service_provider ) {
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Dados não encontrados',
+            ]));
         }
 
-        return $this->redirect(['action' => 'index']);
+        $services = $dados['services'];
+        foreach ($services as $key => $service) {
+            $service['price'] = preg_replace('/[^0-9.,]/', '', $service['price']);
+            $service['price'] = str_replace('.', '', $service['price']); // remover possível separador de milhar
+            $service['price'] = str_replace(',', '.', $service['price']); // substituir vírgula por ponto
+            $service['price'] = (float) $service['price']; // converter para float
+            $services[$key]['price'] = $service['price'];
+            $services[$key]['service_provider_id'] = $user->service_provider_id;
+        }
+
+        foreach ($services as $key => $service) {
+
+            if ( isset($service['id']) ) {
+                $serviceEntity = $this->Services->findOrCreate(['id' => $service['id']]);
+            } else {
+                $serviceEntity = $this->Services->newEmptyEntity();
+            }
+
+            $serviceEntity = $this->Services->patchEntity($serviceEntity, $services[$key]);
+            $this->Services->saveOrFail($serviceEntity);
+        }
+  
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'message' => 'Dados atualizados com sucesso!',
+        ]));
+
     }
 }
