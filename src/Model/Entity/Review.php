@@ -31,12 +31,12 @@ class Review extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
-        'created' => true,
-        'modified' => true,
         'user_id' => true,
         'service_id' => true,
         'rating' => true,
         'comment' => true,
+        'created' => true,
+        'modified' => true,
         'user' => true,
         'service' => true,
     ];

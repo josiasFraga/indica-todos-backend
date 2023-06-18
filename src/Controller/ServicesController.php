@@ -62,13 +62,38 @@ class ServicesController extends AppController
         ]));
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id Service id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
+    public function byProvider()
+    {
+        
+        $this->request->allowMethod(['get']);
+
+        $this->loadModel('Services');
+
+        $data = $this->Services->find()
+        ->select([
+            'id', 
+            'title', 
+            'description', 
+            'category_id',
+            'subcategory_id',
+            'price',
+            'price_unit',
+        ])
+        ->where([
+            'Services.service_provider_id' => $this->request->getQuery('service_provider_id')
+        ])->toArray();
+
+        foreach( $data as $key => $d ) {
+            $data[$key]['price'] = "R$ " . number_format(floatval($d['price']), 2, ',', '.');            
+        }
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'data' => $data,
+        ]));
+    }
+
     public function view($id = null)
     {
         $service = $this->Services->get($id, [

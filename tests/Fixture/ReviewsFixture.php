@@ -24,7 +24,8 @@ class ReviewsFixture extends TestFixture
                 'service_id' => 1,
                 'rating' => 1,
                 'comment' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
-                'created_at' => '2023-04-18 17:29:12',
+                'created' => '2023-06-18 16:25:48',
+                'modified' => '2023-06-18 16:25:48',
             ],
         ];
         parent::init();

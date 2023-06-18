@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 use Cake\Log\Log;
+use Cake\I18n\FrozenTime;
 
 /**
  * ServiceProviders Controller
@@ -184,5 +185,68 @@ class ServiceProvidersController extends AppController
 
     }
 
+    public function saveRating()
+    {
+        $this->request->allowMethod(['post', 'put']);
+    
+        $dados = json_decode($this->request->getData('dados'), true);
+    
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+        $dados['user_id'] = $userId;
+        //Log::debug($this->request->getData('dados'));
+
+        // Obtendo o registro do prestador de serviço
+        $serviceProvider = $this->ServiceProviders->get($dados['service_provider_id']);
+
+        if ( !$serviceProvider ) {
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Dados do prestador não encontrados',
+            ]));
+        }
+
+        $this->loadModel('Reviews');
+
+        // Verificar se o usuário já avaliou o prestador de serviços nos últimos sete dias
+        $existingReview = $this->Reviews->find()
+            ->contain('Services')
+            ->where([
+                'user_id' => $userId,
+                'service_provider_id' => $dados['service_provider_id'],
+                'Reviews.created >=' => new FrozenTime('-7 days'),
+            ])
+            ->first();
+
+        if ($existingReview) {
+            return $this->response->withType('application/json')
+                ->withStringBody(json_encode([
+                    'status' => 'warning',
+                    'message' => 'Você já avaliou este prestador de serviços nos últimos sete dias. Aguarde este prazo para poder avaliar novamente.',
+                ]));
+        }
+
+        $review = $this->Reviews->newEmptyEntity();
+        $review = $this->Reviews->patchEntity($review, $dados);
+
+        // Salvando as alterações
+        if ( !$this->Reviews->save($review) ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Erro ao enviar sua avaliação. Por favor, tente novamente mais tarde!',
+            ]));
+        }
+        
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'message' => 'Sua avaliação foi registrada com sucesso!',
+        ]));
+
+    }
 
 }

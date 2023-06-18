@@ -13,6 +13,7 @@ class JwtMiddleware
     private $publicRoutes = [
         '/auth/login',
         '/users/add',
+        '/services/by-provider',
         '/service-categories/index',
         '/service-subcategories/index',
         '/service-providers/index',

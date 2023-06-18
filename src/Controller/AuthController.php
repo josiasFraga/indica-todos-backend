@@ -50,7 +50,7 @@ class AuthController extends AppController
                     'services_exist' => $checkService ? '1' : '0'
                 ]));
         } else {
-            throw new Exception('Usuário ou senha inválidos');
+            throw new UnauthorizedException('Usuário ou senha inválidos');
         }
     }
 
