@@ -17,6 +17,7 @@ class JwtMiddleware
         '/service-categories/index',
         '/service-subcategories/index',
         '/service-providers/index',
+        '/service-providers/reviews',
         '/user-locations/add',
         '/user-locations/last',
         '/service-provider-visits/add',

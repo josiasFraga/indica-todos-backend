@@ -13,11 +13,7 @@ use Cake\I18n\FrozenTime;
  */
 class ServiceProvidersController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
+
     public function index()
     {
 
@@ -52,7 +48,7 @@ class ServiceProvidersController extends AppController
             ->order(['Reviews.created DESC'])
             ->toArray();
             //$servide_provider->avg_reviews = $this->calcAvgReviews();
-            $serviceProviders[$key]->_reviews = $reviews;
+            //$serviceProviders[$key]->_reviews = $reviews;
             $serviceProviders[$key]->avg_reviews = $this->calcAvgReviews($reviews);
         }
     
@@ -60,6 +56,38 @@ class ServiceProvidersController extends AppController
     
         $this->set([
             'data' => $serviceProviders,
+            'status' => 'ok',
+            '_serialize' => ['data', 'status']
+        ]);
+    }
+
+    public function reviews()
+    {
+
+        $conditions = [];
+        $service_provider_id = $this->request->getQuery('service_provider_id');
+
+        $this->loadModel('Reviews');
+        
+        $reviews = $this->Reviews->find()->where([
+            'Services.service_provider_id' => $service_provider_id,
+        ])
+        ->select([
+            'Reviews.created',
+            'Reviews.comment',
+            'Reviews.rating',
+            'Services.title',
+            'Users.name',
+            'Users.photo',
+        ])
+        ->contain(['Services', 'Users'])
+        ->order(['Reviews.created DESC'])
+        ->toArray();
+    
+        
+    
+        $this->set([
+            'data' => $reviews,
             'status' => 'ok',
             '_serialize' => ['data', 'status']
         ]);
