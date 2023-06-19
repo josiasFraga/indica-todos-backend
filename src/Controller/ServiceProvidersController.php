@@ -24,6 +24,8 @@ class ServiceProvidersController extends AppController
         $conditions = [];
         $categoriaId = $this->request->getQuery('categoria_id');
 
+        $this->loadModel('Reviews');
+
         $serviceProviders = $this->ServiceProviders
         ->find()
         ->matching('Services', function ($q) use ($categoriaId) {
@@ -32,7 +34,30 @@ class ServiceProvidersController extends AppController
             }
             return $q;
         })
-        ->contain(['Services'])->group(['ServiceProviders.id']);
+        ->contain(['Services'])->group(['ServiceProviders.id'])->toArray();
+
+        foreach ( $serviceProviders as $key => $servide_provider ){ 
+            $reviews = $this->Reviews->find()->where([
+                'Services.service_provider_id' => $servide_provider['id']
+            ])
+            ->select([
+                'Reviews.created',
+                'Reviews.comment',
+                'Reviews.rating',
+                'Services.title',
+                'Users.name',
+                'Users.photo',
+            ])
+            ->contain(['Services', 'Users'])
+            ->order(['Reviews.created DESC'])
+            ->toArray();
+            //$servide_provider->avg_reviews = $this->calcAvgReviews();
+            $serviceProviders[$key]->_reviews = $reviews;
+            $serviceProviders[$key]->avg_reviews = $this->calcAvgReviews($reviews);
+        }
+    
+        
+    
         $this->set([
             'data' => $serviceProviders,
             'status' => 'ok',
@@ -246,6 +271,25 @@ class ServiceProvidersController extends AppController
             'status' => 'ok',
             'message' => 'Sua avaliação foi registrada com sucesso!',
         ]));
+
+    }
+
+    private function calcAvgReviews( $reviews = [] ) {
+
+        if ( count($reviews) == 0 ) {
+            return 0;
+        }
+
+        $totalRatings = count($reviews);
+        $sumRatings = 0;
+
+        foreach ($reviews as $rating) {
+            $sumRatings += $rating['rating'];
+        }
+
+        $averageRating = $totalRatings > 0 ? $sumRatings / $totalRatings : 0;
+
+        return $averageRating;
 
     }
 

@@ -36,6 +36,7 @@ class Service extends Entity
      * @var array<string, bool>
      */
     protected $_accessible = [
+        'id' => true,
         'title' => true,
         'description' => true,
         'category_id' => true,

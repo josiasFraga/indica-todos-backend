@@ -14,6 +14,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\LocationsTable&\Cake\ORM\Association\HasMany $Locations
  * @property \App\Model\Table\PaymentsTable&\Cake\ORM\Association\HasMany $Payments
  * @property \App\Model\Table\ServicesTable&\Cake\ORM\Association\HasMany $Services
+ * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\HasMany $Users
  *
  * @method \App\Model\Entity\ServiceProvider newEmptyEntity()
  * @method \App\Model\Entity\ServiceProvider newEntity(array $data, array $options = [])
@@ -59,9 +60,6 @@ class ServiceProvidersTable extends Table
             'foreignKey' => 'service_provider_id',
         ]);
         $this->hasMany('Users', [
-            'foreignKey' => 'service_provider_id',
-        ]);
-        $this->hasMany('ServiceProviders', [
             'foreignKey' => 'service_provider_id',
         ]);
     }
