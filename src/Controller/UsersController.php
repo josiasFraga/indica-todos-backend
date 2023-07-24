@@ -473,4 +473,26 @@ class UsersController extends AppController
         ];
 
     }
+
+    public function deleteAccount (){
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $user = $this->Users->get($jwtPayload->sub);
+
+        if ( !$this->Users->delete($user) ) {
+
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Ocorreu um erro ao tentar excluir sua conta de usuário. Por favor, tente novamente mais tarde.'
+            ]));
+        }
+
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'message' => 'Conta excluída com sucesso'
+        ]));
+
+    }
 }
