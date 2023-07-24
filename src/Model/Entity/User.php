@@ -45,6 +45,7 @@ class User extends Entity
         'cpf' => true,
         'service_provider' => true,
         'reviews' => true,
+        'change_password_tokens' => true,
     ];
 
     /**

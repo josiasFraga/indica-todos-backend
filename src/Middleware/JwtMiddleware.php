@@ -22,6 +22,9 @@ class JwtMiddleware
         '/user-locations/last',
         '/service-provider-visits/add',
         '/measurement-units/index',
+        '/change-password/send-code',
+        '/change-password/verify-code',
+        '/change-password/change-password',
     ];
 
     public function __invoke(ServerRequest $request, Response $response, $next)

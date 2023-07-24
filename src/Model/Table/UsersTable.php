@@ -57,6 +57,9 @@ class UsersTable extends Table
         $this->hasMany('Reviews', [
             'foreignKey' => 'user_id',
         ]);
+        $this->hasMany('ChangePasswordTokens', [
+            'foreignKey' => 'user_id',
+        ]);
         $this->hasMany('ServiceProviderVisits', [
             'foreignKey' => 'user_id',
         ]);
