@@ -19,14 +19,19 @@ class ServiceProvidersController extends AppController
 
         $conditions = [];
         $categoriaId = $this->request->getQuery('categoria_id');
+        $subcategoriasIds = $this->request->getQuery('subcategorias_ids');
+
 
         $this->loadModel('Reviews');
 
         $serviceProviders = $this->ServiceProviders
         ->find()
-        ->matching('Services', function ($q) use ($categoriaId) {
+        ->matching('Services', function ($q) use ($categoriaId, $subcategoriasIds) {
             if (!empty($categoriaId)) {
-                return $q->where(['Services.category_id' => $categoriaId]);
+                $q->where(['Services.category_id' => $categoriaId]);
+            }
+            if (!empty($subcategoriasIds)) {
+                $q->where(['Services.subcategory_id IN' => explode(',',$subcategoriasIds)]);
             }
             return $q;
         })
