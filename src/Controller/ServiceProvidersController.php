@@ -21,8 +21,8 @@ class ServiceProvidersController extends AppController
         $categoriaId = $this->request->getQuery('categoria_id');
         $subcategoriasIds = $this->request->getQuery('subcategorias_ids');
 
-
         $this->loadModel('Reviews');
+        $this->loadModel('Services');
 
         $serviceProviders = $this->ServiceProviders
         ->find()
@@ -55,8 +55,19 @@ class ServiceProvidersController extends AppController
             //$servide_provider->avg_reviews = $this->calcAvgReviews();
             //$serviceProviders[$key]->_reviews = $reviews;
             $serviceProviders[$key]->avg_reviews = $this->calcAvgReviews($reviews);
-        }
     
+
+            $subcategories = $this->Services->find('list')
+            ->select(['ServiceSubcategories.id', 'ServiceSubcategories.name'])
+            ->contain(['ServiceSubcategories'])
+            ->where(['Services.service_provider_id' => $servide_provider['id']])
+            ->group('ServiceSubcategories.id')
+            ->order(['ServiceSubcategories.name' => 'ASC'])
+            ->toArray();
+
+            $serviceProviders[$key]->_subcategories = array_values($subcategories);
+
+        }
         
     
         $this->set([
