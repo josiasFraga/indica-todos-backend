@@ -48,7 +48,7 @@ class UserLocationsController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Erro ao salvar os dados da localiação',
+                'message' => 'Erro ao salvar os dados da localiação',
                 'error' => $errors
             ]));
         }
@@ -56,7 +56,7 @@ class UserLocationsController extends AppController
         return $this->response->withType('application/json')
         ->withStringBody(json_encode([
             'status' => 'ok',
-            'msg' => 'Localização cadastrada com sucesso!'
+            'message' => 'Localização cadastrada com sucesso!'
         ]));
     }
 

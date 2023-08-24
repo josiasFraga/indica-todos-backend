@@ -123,7 +123,7 @@ class ServicesController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Sem permissão de acesso'
+                'message' => 'Sem permissão de acesso'
             ]));
 
         }
@@ -140,7 +140,7 @@ class ServicesController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Erro ao salvar os dados do serviço',
+                'message' => 'Erro ao salvar os dados do serviço',
                 'error' => $errors
             ]));
         }
@@ -148,7 +148,7 @@ class ServicesController extends AppController
         return $this->response->withType('application/json')
         ->withStringBody(json_encode([
             'status' => 'ok',
-            'msg' => 'Seriviço cadastrado com sucesso!'
+            'message' => 'Seriviço cadastrado com sucesso!'
         ]));
     }
 
@@ -173,7 +173,7 @@ class ServicesController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Sem permissão de acesso'
+                'message' => 'Sem permissão de acesso'
             ]));
 
         }
@@ -189,7 +189,7 @@ class ServicesController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Dados do serviço não encontrados.'
+                'message' => 'Dados do serviço não encontrados.'
             ]));
 
         }
@@ -203,7 +203,7 @@ class ServicesController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Ocorreu um erro ao atualizar o serviço, por favor, tente mais tarde'
+                'message' => 'Ocorreu um erro ao atualizar o serviço, por favor, tente mais tarde'
             ]));
 
         }
@@ -211,7 +211,7 @@ class ServicesController extends AppController
         return $this->response->withType('application/json')
         ->withStringBody(json_encode([
             'status' => 'ok',
-            'msg' => 'Serviço alterado com sucesso!'
+            'message' => 'Serviço alterado com sucesso!'
         ]));
     
     }

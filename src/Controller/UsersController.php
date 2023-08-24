@@ -24,11 +24,7 @@ use Cake\Core\Exception\Exception as CakeException;
  */
 class UsersController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
+
     public function index()
     {
         $this->paginate = [
@@ -39,13 +35,6 @@ class UsersController extends AppController
         $this->set(compact('users'));
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function me($id = null)
     {
         $jwtPayload = $this->request->getAttribute('jwtPayload');
@@ -68,11 +57,6 @@ class UsersController extends AppController
         ]));
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
     public function add()
     {
         $this->request->allowMethod(['post', 'put']);
@@ -89,7 +73,7 @@ class UsersController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Occoreu um erro ao salvar seus dados. Por favor, tent mais tarde!',
+                'message' => 'Occoreu um erro ao salvar seus dados. Por favor, tent mais tarde!',
                 'error' => $errors
             ]));
         }
@@ -97,7 +81,7 @@ class UsersController extends AppController
         return $this->response->withType('application/json')
         ->withStringBody(json_encode([
             'status' => 'ok',
-            'msg' => 'Seu cadastro foi efetuado com suscesso!'
+            'message' => 'Seu cadastro foi efetuado com suscesso!'
         ]));
 
     }
@@ -146,8 +130,8 @@ class UsersController extends AppController
 
         $checkCreditCard = $this->CreditCards->find()
         ->where([
-            'number' => $cc_number, // substitua $number pelo número desejado
-            'user_id' => $userId // substitua $user_id pelo ID do usuário desejado
+            'number' => $cc_number,
+            'user_id' => $userId
         ]);
 
         $checkCreditCard = $checkCreditCard->first(); // Retorna o primeiro registro que corresponde à consulta
@@ -159,6 +143,7 @@ class UsersController extends AppController
             try{
     
                 $create_token_cc = $this->createCreditCardToken($cc_number, $cc_secure_code, $cc_expiry_month, $cc_expiry_year);
+
             } catch (\Exception $e) {
                 // Tratamento da exceção            
                 return $this->response->withType('application/json')
@@ -183,7 +168,7 @@ class UsersController extends AppController
                 return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Erro com os dados do cartão de crédito',
+                    'message' => 'Erro com os dados do cartão de crédito',
                     'error' => $errors
                 ]));
             }
@@ -225,8 +210,9 @@ class UsersController extends AppController
 
         //criando assiantura
         try{
-            $create_signature_token_cc = 'aaa';
-            //$create_signature_token_cc = $this->createSignature($dados_assinatura);
+            //$create_signature_token_cc = 'aaa';
+            $create_signature_token = $this->createSignature($dados_assinatura);
+
         } catch (\Exception $e) {
             // Tratamento da exceção
             return $this->response->withType('application/json')
@@ -236,7 +222,7 @@ class UsersController extends AppController
                 ]));
         }
 
-        $serviceProvider->active_signature = $create_signature_token_cc;
+        $serviceProvider->active_signature = $create_signature_token;
         
         if ( !$this->ServiceProviders->save($serviceProvider) ) {
             return $this->response->withType('application/json')
@@ -248,24 +234,23 @@ class UsersController extends AppController
         }
 
         $this->loadModel('Services');
+        //Log::write('debug', var_export($services, true));
         $services = $this->Services->newEntities($services);
         $save_service = $this->Services->saveMany($services);
     
         if ( !$save_service ) {
-            /*$errors = [];
+            $errors = [];
             foreach ($services as $service) {
                 $errors[] = $service->getErrors();
             }
-            debug($errors);
-            die();*/
+            
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
                     'message' => 'Ocorreu um erro ao tentar salvar os serviços prestados',
-                ]));
+                    'errors' => $errors
+            ]));
         }
-
-
 
         return $this->response->withType('application/json')
             ->withStringBody(json_encode([
@@ -411,7 +396,7 @@ class UsersController extends AppController
     
         $pagseguro = new PagseguroTable();
    
-        // Solicitar a criação do token do cartão de crédito
+        // Solicitar a criação do token de assinatura
         $response = $pagseguro->criarAssinatura($dados);
 
         if ( $response == false ) {
@@ -420,9 +405,6 @@ class UsersController extends AppController
 
         $xml = simplexml_load_string($response);
 
-        debug($response);
-        die();
-
         // Verifica se existem elementos <error>
         if ($xml->error && count($xml->error) > 0) {
             // Extrai a mensagem de erro
@@ -430,10 +412,10 @@ class UsersController extends AppController
             throw new CakeException($errorMsg);
         }
 
-        // Extrai o Session Card Token
-        $cardToken = (string) $xml->token;
+        // Extrai o Code da assinatura
+        $code = (string) $xml->code;
         
-        return $cardToken;
+        return $code;
     
     }
 
@@ -476,7 +458,19 @@ class UsersController extends AppController
 
     public function deleteAccount (){
         $jwtPayload = $this->request->getAttribute('jwtPayload');
-        $user = $this->Users->get($jwtPayload->sub);
+        $user = $this->Users->get($jwtPayload->sub, [
+            'contain' => ['ServiceProviders']
+        ]);
+
+        if ( isset($user->service_provider->active_signature) && !empty($user->service_provider->active_signature) ) {
+    
+            $pagseguro = new PagseguroTable();
+
+            //cancelar a assinatura no pagseguro
+            $response = $pagseguro->cancelarAssinatura($user->service_provider->active_signature);
+
+        }
+
 
         if ( !$this->Users->delete($user) ) {
 

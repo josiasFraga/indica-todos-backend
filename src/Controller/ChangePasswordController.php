@@ -21,7 +21,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Email não informado',
+                'message' => 'Email não informado',
             ]));
         }
 
@@ -33,7 +33,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'ok',
-                    'msg' => 'Código enviado para o email ' . $dados['user_email'],
+                    'message' => 'Código enviado para o email ' . $dados['user_email'],
                 ]));
         }
 
@@ -64,7 +64,7 @@ class ChangePasswordController extends AppController
                 return $this->response->withType('application/json')
                     ->withStringBody(json_encode([
                         'status' => 'erro',
-                        'msg' => 'Ocorreu um erro ao salvar o código',
+                        'message' => 'Ocorreu um erro ao salvar o código',
                     ]));
             }
         }
@@ -81,7 +81,7 @@ class ChangePasswordController extends AppController
         return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'ok',
-                'msg' => 'Código enviado com sucesso!',
+                'message' => 'Código enviado com sucesso!',
             ]));
 
     }
@@ -95,7 +95,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Email e/ou código não informado(s)',
+                    'message' => 'Email e/ou código não informado(s)',
                 ]));
         }
 
@@ -109,7 +109,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Código inválido ou expirado',
+                    'message' => 'Código inválido ou expirado',
                 ]));
         }
 
@@ -127,7 +127,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Código inválido ou expirado',
+                    'message' => 'Código inválido ou expirado',
                 ]));
         }
 
@@ -137,7 +137,7 @@ class ChangePasswordController extends AppController
         return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'ok',
-                'msg' => 'Código válido',
+                'message' => 'Código válido',
             ]));
     }
 
@@ -154,7 +154,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Email, código e/ou nova senha não informados',
+                    'message' => 'Email, código e/ou nova senha não informados',
                 ]));
         }
 
@@ -168,7 +168,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Usuário não encontrado',
+                    'message' => 'Usuário não encontrado',
                 ]));
         }
 
@@ -186,7 +186,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Código inválido ou expirado',
+                    'message' => 'Código inválido ou expirado',
                 ]));
         }
 
@@ -196,7 +196,7 @@ class ChangePasswordController extends AppController
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
                     'status' => 'erro',
-                    'msg' => 'Erro ao atualizar a senha',
+                    'message' => 'Erro ao atualizar a senha',
                 ]));
         }
 
@@ -206,7 +206,7 @@ class ChangePasswordController extends AppController
         return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'ok',
-                'msg' => 'Senha atualizada com sucesso!',
+                'message' => 'Senha atualizada com sucesso!',
             ]));
     }
 

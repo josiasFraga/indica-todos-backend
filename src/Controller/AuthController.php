@@ -8,6 +8,8 @@ use Cake\Core\Exception\Exception;
 use Cake\Utility\Security;
 use Firebase\JWT\JWT;
 use Cake\ORM\TableRegistry;
+use App\Model\Table\PagseguroTable;
+use Cake\Core\Exception\Exception as CakeException;
 use Cake\Http\Exception\UnauthorizedException;
 
 class AuthController extends AppController
@@ -18,6 +20,7 @@ class AuthController extends AppController
     {
         $usersTable = TableRegistry::getTableLocator()->get('Users');
         $servicesTable = TableRegistry::getTableLocator()->get('Services');
+        $serviceProviders = TableRegistry::getTableLocator()->get('ServiceProviders');
         $dados = json_decode($this->request->getData('dados'), true);
 
         $user = $usersTable->find()
@@ -42,8 +45,44 @@ class AuthController extends AppController
                     
             $jwt = JWT::encode($payload, Security::getSalt(), 'HS256');
 
+            // Verifico se o usuário é um prestador de serviços, se for, verifico se a assinatura está ok
+            if ( !empty($user->service_provider_id) && $checkService ) {
+
+                $pagseguro = new PagseguroTable();
+
+                $response = $pagseguro->verificarAssinatura($user->service_provider->active_signature);
+
+                $xml = simplexml_load_string($response);
+        
+                // Verifica se existem elementos <error>
+                if ($xml->error && count($xml->error) > 0) {
+                    // Extrai a mensagem de erro
+                    $errorMsg = (string) $xml->error->message;
+                    throw new CakeException($errorMsg);
+                }
+    
+                // Extrai o Code da assinatura
+                $status = (string) $xml->status;
+
+                $service_provider = $serviceProviders->get($user->service_provider->id);
+                $service_provider->signature_status = $status;
+
+                $serviceProviders->save($service_provider);
+
+                if ( $status != "ACTIVE" ) {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode([
+                            'status' => "erro",
+                            'error' => "invalid_signature"
+                    ]));
+
+                }
+
+            } 
+
             return $this->response->withType('application/json')
                 ->withStringBody(json_encode([
+                    'status' => "ok",
                     'token' => $jwt,
                     'validation' => $valdiade,
                     'type' => !empty($user->service_provider_id) ? 'servide_provider' : 'user',

@@ -54,5 +54,7 @@ class ServiceProvider extends Entity
         'locations' => true,
         'payments' => true,
         'services' => true,
+        'active_signature' => true,
+        'signature_status' => true
     ];
 }

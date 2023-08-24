@@ -84,7 +84,7 @@ class ServicesTable extends Table
         $validator
             ->scalar('description')
             ->requirePresence('description', 'create')
-            ->notEmptyString('description');
+            ->allowEmptyString('description');
 
         $validator
             ->integer('category_id')

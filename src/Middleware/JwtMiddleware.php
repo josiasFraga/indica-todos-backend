@@ -25,6 +25,7 @@ class JwtMiddleware
         '/change-password/send-code',
         '/change-password/verify-code',
         '/change-password/change-password',
+        '/webhooks/pagseguro',
     ];
 
     public function __invoke(ServerRequest $request, Response $response, $next)

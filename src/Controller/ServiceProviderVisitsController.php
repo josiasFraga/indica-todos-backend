@@ -51,7 +51,7 @@ class ServiceProviderVisitsController extends AppController
             return $this->response->withType('application/json')
             ->withStringBody(json_encode([
                 'status' => 'erro',
-                'msg' => 'Erro ao salvar os dados da visita',
+                'message' => 'Erro ao salvar os dados da visita',
                 'error' => $errors
             ]));
         }
@@ -59,7 +59,7 @@ class ServiceProviderVisitsController extends AppController
         return $this->response->withType('application/json')
         ->withStringBody(json_encode([
             'status' => 'ok',
-            'msg' => 'Visita salva com sucesso'
+            'message' => 'Visita salva com sucesso'
         ]));
     }
 }

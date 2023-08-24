@@ -200,7 +200,6 @@ class PagseguroTable extends Table
         if ($response === false) {
             $error = curl_error($curl);
             $errorCode = curl_errno($curl);
-            debug($error);
             curl_close($curl);
         
             // Retorne o erro ou faça algo com base nele
@@ -213,5 +212,89 @@ class PagseguroTable extends Table
 
     }
 
+    public function cancelarAssinatura($signature_code)
+    {
+        // Carrega as configurações do arquivo pagseguro.php
+        Configure::load('pagseguro');
+
+        // Obtém as configurações do PagSeguro
+        $pagseguroConfig = Configure::read('PagSeguro');
+
+        $url = 'https://ws.sandbox.pagseguro.uol.com.br/pre-approvals/' . $signature_code . '/cancel?email=' . $pagseguroConfig['email'] . '&token=' . $pagseguroConfig['token'];
+
+        $curl = curl_init();
+    
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'PUT',
+            CURLOPT_SSL_VERIFYPEER => false,
+        ));
+
+        $response = curl_exec($curl);
+
+        if ($response === false) {
+            $error = curl_error($curl);
+            $errorCode = curl_errno($curl);
+            curl_close($curl);
+        
+            // Retorne o erro ou faça algo com base nele
+            return false;
+        }
+    
+        curl_close($curl);
+    
+        return $response;
+    }
+
+    public function verificarAssinatura($signature_code)
+    {
+        // Carrega as configurações do arquivo pagseguro.php
+        Configure::load('pagseguro');
+
+        // Obtém as configurações do PagSeguro
+        $pagseguroConfig = Configure::read('PagSeguro');
+
+        $url = 'https://ws.sandbox.pagseguro.uol.com.br/pre-approvals/' . $signature_code . '?email=' . $pagseguroConfig['email'] . '&token=' . $pagseguroConfig['token'];
+    
+        $curl = curl_init();
+    
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_HTTPHEADER => array(
+                'Accept: application/vnd.pagseguro.com.br.v3+xml;charset=ISO-8859-1',
+                'Content-Type: application/json'
+            ),
+        ));
+    
+        $response = curl_exec($curl);
+
+        if ($response === false) {
+            $error = curl_error($curl);
+            $errorCode = curl_errno($curl);
+            curl_close($curl);
+        
+            // Retorne o erro ou faça algo com base nele
+            return false;
+        }
+    
+        curl_close($curl);
+    
+        return $response;
+
+    }
 
 }
