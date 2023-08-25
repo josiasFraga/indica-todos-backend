@@ -15,7 +15,6 @@ use Cake\Http\Exception\UnauthorizedException;
 class AuthController extends AppController
 {
     
-
     public function login()
     {
         $usersTable = TableRegistry::getTableLocator()->get('Users');

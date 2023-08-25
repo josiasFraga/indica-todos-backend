@@ -259,6 +259,35 @@ class UsersController extends AppController
             ]));
     }
 
+    public function signatureStatus()
+    {
+
+        $this->request->allowMethod(['get']);
+
+        $this->loadModel('ServiceProviders');
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $userId = $jwtPayload->sub;
+        $query = $this->Users->find()->contain('ServiceProviders')->where(['Users.id' => $userId]);
+        $user = $query->first();
+
+        $serviceProvider = $this->ServiceProviders->get($user->service_provider->id);
+        
+        if ( !$serviceProvider ) {
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Não encontramos os dados da sua empresa.',
+            ]));
+
+        }
+
+        return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'ok',
+                'data' => $serviceProvider->signature_status,
+            ]));
+    }
+
     public function changePassword (){
         $jwtPayload = $this->request->getAttribute('jwtPayload');
         $user = $this->Users->get($jwtPayload->sub, [
@@ -393,6 +422,7 @@ class UsersController extends AppController
 
     private function createSignature($dados)
     {
+        //Log::write('debug', var_export($dados, true));
     
         $pagseguro = new PagseguroTable();
    

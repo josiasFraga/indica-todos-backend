@@ -123,8 +123,8 @@ class PagseguroTable extends Table
                 "email": "' . $dados['user_email'] . '",
                 "ip": "' . $dados['user_ip'] . '",
                 "phone": {
-                    "areaCode": "' . $dados['user_phone_ddd'] . '",
-                    "number": "' . $dados['user_phone_number'] . '"
+                    "areaCode": "' . $dados['cc_holder_ddd'] . '",
+                    "number": "' . $dados['cc_holder_phone'] . '"
                 },
                 "address": {
                     "street": "' . $dados['user_addess'] . '",
@@ -139,7 +139,7 @@ class PagseguroTable extends Table
                 "documents": [
                     {
                         "type": "CPF",
-                        "value": "' . $dados['user_cpf'] . '"
+                        "value": "' . $dados['cc_holder_cpf'] . '"
                     }
                 ]
             },
