@@ -50,7 +50,7 @@ return [
         'namespace' => 'App',
         'encoding' => env('APP_ENCODING', 'UTF-8'),
         'defaultLocale' => env('APP_DEFAULT_LOCALE', 'en_US'),
-        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'UTC'),
+        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'America/Sao_Paulo'),
         'base' => false,
         'dir' => 'src',
         'webroot' => 'webroot',
@@ -314,6 +314,7 @@ return [
         'default' => [
             'className' => Connection::class,
             'driver' => Mysql::class,
+            'init' => ['SET time_zone = \'-03:00\''],
             'persistent' => false,
             'timezone' => 'UTC',
 

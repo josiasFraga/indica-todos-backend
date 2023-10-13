@@ -44,8 +44,8 @@ class AuthController extends AppController
                     
             $jwt = JWT::encode($payload, Security::getSalt(), 'HS256');
 
-            // Verifico se o usuário é um prestador de serviços, se for, verifico se a assinatura está ok
-            if ( !empty($user->service_provider_id) && $checkService ) {
+            // Verifico se o usuário é um prestador de serviços e não está em testes, se for, verifico se a assinatura está ok
+            if ( !empty($user->service_provider_id) && $checkService && $user->service_provider->signature_status != 'TRIAL' ) {
 
                 $pagseguro = new PagseguroTable();
 

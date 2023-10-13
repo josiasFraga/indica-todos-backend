@@ -6,6 +6,7 @@ use Cake\Http\Exception;
 use Cake\Http\Exception\UnauthorizedException;
 use Cake\Log\Log;
 use Cake\I18n\Number;
+use Cake\I18n\Time;
 use App\Model\Entity\Service;
 use Cake\Http\ServerRequest;
 
@@ -15,6 +16,7 @@ use PagSeguro\Domains\Requests\DirectPayment\CreditCard as CreditCardRequest;
 use PagSeguro\Services\Transactions\CreateTransaction;
 use App\Model\Table\PagseguroTable;
 use Cake\Core\Exception\Exception as CakeException;
+
 
 /**
  * Users Controller
@@ -61,6 +63,9 @@ class UsersController extends AppController
     {
         $this->request->allowMethod(['post', 'put']);
         $dados = json_decode($this->request->getData('dados'), true);
+    
+        $dados['created'] = Time::now()->setTimezone('America/Sao_Paulo');
+
 
         $user = $this->Users->newEntity($dados, [
             'associated' => ['ServiceProviders.Services']
@@ -122,7 +127,9 @@ class UsersController extends AppController
             $services[$key]['service_provider_id'] = $user->service_provider_id;
         }
 
-        $cc_number = $dados['cc_number'];
+        $serviceProvider->signature_status = "TRIAL";
+
+        /*$cc_number = $dados['cc_number'];
         $cc_name = $dados['cc_name'];
         $cc_expiry = $dados['cc_expiry'];
         list($cc_expiry_month, $cc_expiry_year) = explode('/',$cc_expiry);
@@ -223,6 +230,7 @@ class UsersController extends AppController
         }
 
         $serviceProvider->active_signature = $create_signature_token;
+        */
         
         if ( !$this->ServiceProviders->save($serviceProvider) ) {
             return $this->response->withType('application/json')
