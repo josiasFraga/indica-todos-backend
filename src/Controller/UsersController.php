@@ -91,6 +91,56 @@ class UsersController extends AppController
 
     }
 
+    public function addMyBusiness()
+    {
+        $this->request->allowMethod(['post', 'put']);
+    
+        $jwtPayload = $this->request->getAttribute('jwtPayload');
+        $logged_user = $this->Users->find()
+        ->select(['id', 'service_provider_id'])
+        ->where([
+            'Users.id' => $jwtPayload->sub
+        ])->first();
+
+        if ( !empty($logged_user['service_provider_id']) ) {
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Seu cadastro já está vinculado a uma empresa!',
+                'error' => ''
+            ]));
+
+        }
+
+ 
+        $dados = json_decode($this->request->getData('dados'), true);
+    
+        $dados['service_provider']['created'] = Time::now()->setTimezone('America/Sao_Paulo');
+    
+        $dados['modified'] = Time::now()->setTimezone('America/Sao_Paulo');
+
+        $user = $this->Users->patchEntity($logged_user, $dados, [
+            'associated' => ['ServiceProviders']
+        ]);
+
+        if ( !$this->Users->save($user) ) {
+            $errors = $user->getErrors();
+            return $this->response->withType('application/json')
+            ->withStringBody(json_encode([
+                'status' => 'erro',
+                'message' => 'Occoreu um erro ao salvar seus dados. Por favor, tent mais tarde!',
+                'error' => $errors
+            ]));
+        }
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'message' => 'Seu cadastro foi efetuado com suscesso!'
+        ]));
+
+    }
+
     public function endProviderRegister()
     {
 
