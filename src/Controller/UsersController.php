@@ -116,7 +116,8 @@ class UsersController extends AppController
         $dados = json_decode($this->request->getData('dados'), true);
     
         $dados['service_provider']['created'] = Time::now()->setTimezone('America/Sao_Paulo');
-    
+        $dados['service_provider']['signature_status'] = 'TRIAL';
+        
         $dados['modified'] = Time::now()->setTimezone('America/Sao_Paulo');
 
         $user = $this->Users->patchEntity($logged_user, $dados, [
