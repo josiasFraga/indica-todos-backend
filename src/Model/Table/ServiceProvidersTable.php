@@ -62,6 +62,9 @@ class ServiceProvidersTable extends Table
         $this->hasMany('Users', [
             'foreignKey' => 'service_provider_id',
         ]);
+        $this->hasMany('ServiceProviderPhotos', [
+            'foreignKey' => 'service_provider_id',
+        ]);
     }
 
     /**

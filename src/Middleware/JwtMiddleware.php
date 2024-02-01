@@ -26,6 +26,9 @@ class JwtMiddleware
         '/change-password/verify-code',
         '/change-password/change-password',
         '/webhooks/pagseguro',
+        '/service-provider-photos/index',
+        '/service-provider-photos/upload',
+        '/service-provider-photos/delete',
     ];
 
     public function __invoke(ServerRequest $request, Response $response, $next)
