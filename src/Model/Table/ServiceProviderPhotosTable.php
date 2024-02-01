@@ -87,12 +87,6 @@ class ServiceProviderPhotosTable extends Table
             ->integer('service_provider_id')
             ->notEmptyString('service_provider_id');
 
-        $validator
-            ->scalar('photo')
-            ->maxLength('photo', 250)
-            ->requirePresence('photo', 'create')
-            ->notEmptyString('photo');
-
         return $validator;
     }
 
