@@ -77,6 +77,14 @@ class Application extends BaseApplication
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
+        $middlewareQueue->add(function ($req, $res, $next) {
+            $response = $next($req, $res);
+            return $response
+                ->withHeader('Access-Control-Allow-Origin', '*') // Permite acessos de qualquer origem
+                ->withHeader('Access-Control-Allow-Methods', ['GET', 'POST', 'PUT', 'DELETE']) // Métodos HTTP permitidos
+                ->withHeader('Access-Control-Allow-Headers', ['Content-Type', 'Authorization']); // Cabeçalhos permitidos
+        });
+        
         $middlewareQueue
             // Catch any exceptions in the lower layers,
             // and make an error page/response

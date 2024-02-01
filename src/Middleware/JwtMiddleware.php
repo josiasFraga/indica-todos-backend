@@ -36,9 +36,13 @@ class JwtMiddleware
         $url = $request->getUri()->getPath();
         $path = parse_url($url, PHP_URL_PATH);
         $pathWithoutExtension = preg_replace('/\.json$/', '', $path);
-
-        if (in_array($pathWithoutExtension, $this->publicRoutes)) {
-            return $next($request, $response);
+    
+        // Verifica se a URL atual corresponde a alguma das rotas públicas
+        foreach ($this->publicRoutes as $route) {
+            $pattern = '/^' . preg_quote($route, '/') . '($|\/)/';
+            if (preg_match($pattern, $pathWithoutExtension)) {
+                return $next($request, $response);
+            }
         }
 
         $header = $request->getHeaderLine('Authorization');

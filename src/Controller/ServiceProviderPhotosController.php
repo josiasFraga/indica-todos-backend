@@ -16,7 +16,7 @@ class ServiceProviderPhotosController extends AppController
         $header = $this->request->getHeaderLine('Authorization');
         $bearerToken = str_replace('Bearer ', '', $header);
         
-        if ($bearerToken) {
+        if ( $bearerToken && !empty($this->request->getQuery('service_provider_id')) ) {
 
             try {
                 $jwtPayload = JWT::decode($bearerToken, new Key(Security::getSalt(), 'HS256'));
