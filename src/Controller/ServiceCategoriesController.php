@@ -21,6 +21,16 @@ class ServiceCategoriesController extends AppController
         //$jwtPayload = $this->request->getAttribute('jwtPayload');
         $with_business = $this->request->getQuery('with_business');
         $user_location = $this->request->getQuery('user_location');
+        $neighborhoods_selecteds = $this->request->getQuery('neighborhoods_selecteds');
+
+        if ( !empty($neighborhoods_selecteds) ) {
+            $neighborhoods_selecteds = explode(',',$neighborhoods_selecteds);
+            $neighborhoods_selecteds = array_filter($neighborhoods_selecteds, function($neighborhoods_selected){
+                if ( !empty($neighborhoods_selected) ) {
+                    return $neighborhoods_selected;
+                }
+            });
+        }
 
 
         $conditions = [];
@@ -30,13 +40,25 @@ class ServiceCategoriesController extends AppController
             ->find('all')
             ->where()
             ->innerJoinWith('Services')
-            ->matching('Services.ServiceProviders', function ($q) use ($user_location) {
+            ->matching('Services.ServiceProviders', function ($q) use ($user_location, $neighborhoods_selecteds) {
                 if (!empty($user_location)) {
+                    
+                    if ( is_array($neighborhoods_selecteds) && count($neighborhoods_selecteds) > 0 ) {
+    
+                        return $q->where([
+                            'ServiceProviders.city' => $user_location['city'],
+                            'ServiceProviders.state' => $user_location['state'],
+                            'ServiceProviders.neighborhood IN' => $neighborhoods_selecteds
+                        ]);
+
+                    }
+    
                     return $q->where([
                         'ServiceProviders.city' => $user_location['city'],
                         'ServiceProviders.state' => $user_location['state']
                     ]);
                 }
+
                 return $q;
             })
             ->distinct(['ServiceCategories.id'])

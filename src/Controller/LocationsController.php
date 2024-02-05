@@ -3,19 +3,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-/**
- * Locations Controller
- *
- * @property \App\Model\Table\LocationsTable $Locations
- * @method \App\Model\Entity\Location[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
- */
+
 class LocationsController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
+
     public function index()
     {
         $this->paginate = [
@@ -26,13 +17,6 @@ class LocationsController extends AppController
         $this->set(compact('locations'));
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id Location id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function view($id = null)
     {
         $location = $this->Locations->get($id, [
@@ -42,11 +26,6 @@ class LocationsController extends AppController
         $this->set(compact('location'));
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
     public function add()
     {
         $location = $this->Locations->newEmptyEntity();
@@ -63,13 +42,7 @@ class LocationsController extends AppController
         $this->set(compact('location', 'serviceProviders'));
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Location id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
+
     public function edit($id = null)
     {
         $location = $this->Locations->get($id, [
@@ -88,13 +61,6 @@ class LocationsController extends AppController
         $this->set(compact('location', 'serviceProviders'));
     }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id Location id.
-     * @return \Cake\Http\Response|null|void Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);

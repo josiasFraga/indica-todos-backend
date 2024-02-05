@@ -17,7 +17,8 @@ class JwtMiddleware
         '/service-categories/index',
         '/service-subcategories/index',
         '/service-providers/index',
-        '/service-providers/reviews',
+        '/service-providers/reviews',        
+        '/service-providers/get-neighborhoods',
         '/user-locations/add',
         '/user-locations/last',
         '/service-provider-visits/add',
@@ -28,7 +29,7 @@ class JwtMiddleware
         '/webhooks/pagseguro',
         '/service-provider-photos/index',
         '/service-provider-photos/upload',
-        '/service-provider-photos/delete',
+        '/service-provider-photos/delete'
     ];
 
     public function __invoke(ServerRequest $request, Response $response, $next)

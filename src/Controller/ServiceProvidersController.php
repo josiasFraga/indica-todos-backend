@@ -346,4 +346,28 @@ class ServiceProvidersController extends AppController
 
     }
 
+    public function getNeighborhoods() {
+
+        $cidade = $this->request->getQuery('cidade');
+        $estado = $this->request->getQuery('estado');
+
+        $neighborhoods = $this->ServiceProviders->find('all')
+        ->select([
+            'ServiceProviders.neighborhood'
+        ])
+        ->where([
+            'ServiceProviders.city' => $cidade,
+            'ServiceProviders.state' => $estado
+        ])
+        ->group('ServiceProviders.neighborhood')
+        ->order('ServiceProviders.neighborhood')
+        ->toArray();
+
+        return $this->response->withType('application/json')
+        ->withStringBody(json_encode([
+            'status' => 'ok',
+            'data' => $neighborhoods,
+        ]));
+    }
+
 }
