@@ -40,6 +40,12 @@ class ServiceCategoriesController extends AppController
             ->find('all')
             ->where()
             ->innerJoinWith('Services')
+            ->contain([
+                'ServiceSubcategories' => function ($q) {
+                    return $q
+                        ->select(['ServiceSubcategories.category_id', 'ServiceSubcategories.name']);
+                }
+            ])
             ->matching('Services.ServiceProviders', function ($q) use ($user_location, $neighborhoods_selecteds) {
                 if (!empty($user_location)) {
                     
@@ -62,7 +68,24 @@ class ServiceCategoriesController extends AppController
                 return $q;
             })
             ->distinct(['ServiceCategories.id'])
-            ->order('ServiceCategories.name');
+            ->order('ServiceCategories.name')
+            ->toArray();
+
+            foreach( $serviceCatgories as $key => $category ){
+                // Inicializa um array para armazenar os nomes das subcategorias
+                $subcategoriesNames = [];
+
+                // Percorre cada subcategoria na categoria atual
+                foreach ($category['service_subcategories'] as $subcategory) {
+                    // Adiciona o nome da subcategoria ao array
+                    $subcategoriesNames[] = $subcategory['name'];
+                }
+
+                // Junta os nomes das subcategorias com vírgula e atualiza a categoria atual com a string resultante
+                $serviceCatgories[$key]['_subcategories_string'] = implode(', ', $subcategoriesNames);
+            }
+
+
         } else {
             
             $serviceCatgories = $this->ServiceCategories->find('all')->where()->order('ServiceCategories.name');

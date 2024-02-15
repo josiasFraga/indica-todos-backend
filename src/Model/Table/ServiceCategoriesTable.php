@@ -45,6 +45,11 @@ class ServiceCategoriesTable extends Table
             'foreignKey' => 'category_id',
             'joinType' => 'INNER',
         ]);
+
+        $this->hasMany('ServiceSubcategories', [
+            'foreignKey' => 'category_id',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**

@@ -22,14 +22,24 @@ class ServiceProvidersController extends AppController
         $state = $this->request->getQuery('state');
         $city = $this->request->getQuery('city');
         $subcategoriasIds = $this->request->getQuery('subcategorias_ids');
+        $selectedsNeighborhoods = $this->request->getQuery('selecteds_neighborhoods');
 
+        if ( !empty($selectedsNeighborhoods) ) {
+            $selectedsNeighborhoods = explode(',',$selectedsNeighborhoods);
+            $selectedsNeighborhoods = array_filter($selectedsNeighborhoods, function($neighborhoods_selected){
+                if ( !empty($neighborhoods_selected) ) {
+                    return $neighborhoods_selected;
+                }
+            });
+        }
 
         $this->loadModel('Reviews');
         $this->loadModel('Services');
+        $this->loadModel('Users');
 
         $serviceProviders = $this->ServiceProviders
         ->find()
-        ->matching('Services', function ($q) use ($categoriaId, $subcategoriasIds, $city, $state) {
+        ->matching('Services', function ($q) use ($categoriaId, $subcategoriasIds, $city, $state, $selectedsNeighborhoods) {
             if (!empty($categoriaId)) {
                 $q->where(['Services.category_id' => $categoriaId]);
             }
@@ -42,9 +52,28 @@ class ServiceProvidersController extends AppController
             if (!empty($state)) {
                 $q->where(['ServiceProviders.state' => $state]);
             }
+            if ( !empty($selectedsNeighborhoods) ){
+                $q->where(['ServiceProviders.neighborhood IN' => $selectedsNeighborhoods]);
+            }
             return $q;
         })
         ->contain(['Services'])->group(['ServiceProviders.id'])->toArray();
+
+        foreach( $serviceProviders as $key => $serviceProvider ){
+
+            $user = $this->Users->find()
+            ->select([
+                'Users.name'
+            ])
+            ->where([
+                'Users.service_provider_id' => $serviceProvider['id']
+            ])
+            ->first();
+            //->toArray();
+
+            $serviceProviders[$key]['_user'] = $user;
+
+        }
 
         foreach ( $serviceProviders as $key => $servide_provider ){ 
             $reviews = $this->Reviews->find()->where([
